@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Annuaire adhérents CD 54 MJSEA</title>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#dbe3ee;
+      --accent:#1d4ed8;
+      --danger:#b91c1c;
+      --warn:#b45309;
+      --ok:#15803d;
+      --pill:#eef2ff;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .app{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-height:100vh;
+    }
+
+    .toolbar{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+
+    .toolbar .grow{ flex:1 1 280px; }
+
+    input, button{
+      font:inherit;
+    }
+
+    input[type="text"]{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+    }
+
+    button{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:10px;
+      padding:9px 12px;
+      cursor:pointer;
+    }
+
+    button:hover{
+      background:#f9fafb;
+    }
+
+    .counter{
+      color:var(--muted);
+      font-size:14px;
+      white-space:nowrap;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+      min-height:0;
+    }
+
+    .panel-header{
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      font-weight:700;
+      background:#fbfcfe;
+    }
+
+    .detail{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .identity{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .identity h1{
+      font-size:24px;
+      line-height:1.2;
+      margin:0 0 6px 0;
+    }
+
+    .subline{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .pills{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .pill{
+      background:var(--pill);
+      color:#3730a3;
+      border:1px solid #c7d2fe;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:600;
+    }
+
+    .pill.ok{ color:#166534; background:#ecfdf5; border-color:#bbf7d0; }
+    .pill.warn{ color:#92400e; background:#fffbeb; border-color:#fde68a; }
+    .pill.danger{ color:#991b1b; background:#fef2f2; border-color:#fecaca; }
+    .pill.neutral{ color:#374151; background:#f3f4f6; border-color:#e5e7eb; }
+
+    .honors{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .honor-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .honor-chip .emoji{
+      font-size:18px;
+      line-height:1;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(240px, 1fr));
+      gap:12px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:#fff;
+    }
+
+    .card h3{
+      margin:0 0 10px 0;
+      font-size:15px;
+    }
+
+    .kv{
+      display:grid;
+      grid-template-columns: 150px 1fr;
+      gap:8px 10px;
+      font-size:14px;
+    }
+
+    .k{
+      color:var(--muted);
+    }
+
+    .v{
+      font-weight:500;
+      word-break:break-word;
+    }
+
+    .decor-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap:10px;
+    }
+
+    .stat{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      text-align:center;
+      background:#fff;
+    }
+
+    .stat .n{
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
+      margin-bottom:6px;
+    }
+
+    .stat .l{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .empty{
+      padding:28px;
+      color:var(--muted);
+    }
+
+    .footer-note{
+      color:var(--muted);
+      font-size:12px;
+      padding-top:4px;
+    }
+
+    .cursor-note{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    a{
+      color:var(--accent);
+      text-decoration:none;
+    }
+
+    a:hover{
+      text-decoration:underline;
+    }
+
+    @media (max-width: 980px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+      .decor-grid{
+        grid-template-columns: repeat(2, minmax(120px,1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="toolbar">
+      <div class="grow">
+        <input id="search" type="text" placeholder="Rechercher : nom, prénom, ville, discipline, fonction, licence..." />
+      </div>
+      <button id="prevBtn">◀ Précédent</button>
+      <button id="nextBtn">Suivant ▶</button>
+      <div class="counter" id="counter">0 adhérent</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">Fiche adhérent</div>
+      <div class="detail" id="detail">
+        <div class="empty">Aucune donnée disponible.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allRecords = [];
+    let filteredRecords = [];
+    let selectedIndex = 0;
+
+    const REQUIRED_COLUMNS = [
+      "Numero_de_licence",
+      "Sexe",
+      "Nom",
+      "Nom_de_jeune_fille",
+      "Prenom",
+      "Date_de_naissance",
+      "Nationalite",
+      "Adresse",
+      "Code_postal",
+      "Ville",
+      "Telephone_1_fixe_",
+      "Telephone_2_mobile_",
+      "Telephone_3",
+      "Adresse_mail_1",
+      "Adresse_mail_2",
+      "Medaille_OR",
+      "Medaille_Argent",
+      "Medaille_Bronze",
+      "Lettre_de_felicitations",
+      "Membre_Sympathisant",
+      "Recompense_Or",
+      "Recompense_Argent",
+      "Recompense_Bronze",
+      "Fonction",
+      "Discipline",
+      "Deces",
+      "Statut_licence",
+      "licencie_a_vie",
+      "Region",
+      "Departement"
+    ];
+
+    function asText(v) {
+      if (v === null || v === undefined) return "";
+      return String(v).trim();
+    }
+
+    function asNumber(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function yesNo(v) {
+      if (v === null || v === undefined || v === "") return "";
+      const n = Number(v);
+      if (Number.isFinite(n)) return n ? "Oui" : "Non";
+      const s = String(v).trim().toLowerCase();
+      if (["oui","yes","true","1"].includes(s)) return "Oui";
+      if (["non","no","false","0"].includes(s)) return "Non";
+      return String(v);
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return String(value);
+      return d.toLocaleDateString("fr-FR");
+    }
+
+    function computeAge(value) {
+      if (!value) return "";
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return "";
+      const now = new Date();
+      let age = now.getFullYear() - d.getFullYear();
+      const m = now.getMonth() - d.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+      return age >= 0 ? age : "";
+    }
+
+    function fullName(r) {
+      const prenom = asText(r.Prenom);
+      const nom = asText(r.Nom);
+      return [prenom, nom].filter(Boolean).join(" ").trim() || "(Sans nom)";
+    }
+
+    function maidenNameLine(r) {
+      const n = asText(r.Nom_de_jeune_fille);
+      return n ? n : "";
+    }
+
+    function searchableText(r) {
+      return [
+        r.Numero_de_licence,
+        r.Nom,
+        r.Prenom,
+        r.Nom_de_jeune_fille,
+        r.Ville,
+        r.Discipline,
+        r.Fonction,
+        r.Adresse_mail_1,
+        r.Adresse_mail_2,
+        r.Departement,
+        r.Region
+      ].map(asText).join(" ").toLowerCase();
+    }
+
+    function getDecorationSummary(r) {
+      const items = [];
+      if (asNumber(r.Medaille_OR)) items.push("🥇 Médaille d'or");
+      if (asNumber(r.Medaille_Argent)) items.push("🥈 Médaille d'argent");
+      if (asNumber(r.Medaille_Bronze)) items.push("🥉 Médaille de bronze");
+      if (asNumber(r.Lettre_de_felicitations)) items.push("📜 Lettre de félicitations");
+      if (asNumber(r.Recompense_Or)) items.push("🏅 Récompense or");
+      if (asNumber(r.Recompense_Argent)) items.push("🏅 Récompense argent");
+      if (asNumber(r.Recompense_Bronze)) items.push("🏅 Récompense bronze");
+      return items;
+    }
+
+    function getHonorChips(r) {
+      const chips = [];
+      if (asNumber(r.Medaille_OR)) {
+        chips.push(`<span class="honor-chip"><span class="emoji">🥇</span><span>Médaille d'or</span></span>`);
+      }
+      if (asNumber(r.Medaille_Argent)) {
+        chips.push(`<span class="honor-chip"><span class="emoji">🥈</span><span>Médaille d'argent</span></span>`);
+      }
+      if (asNumber(r.Medaille_Bronze)) {
+        chips.push(`<span class="honor-chip"><span class="emoji">🥉</span><span>Médaille de bronze</span></span>`);
+      }
+      return chips.join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatEmail(v) {
+      const s = asText(v);
+      if (!s) return "-";
+      const safe = escapeHtml(s);
+      return `<a href="mailto:${safe}">${safe}</a>`;
+    }
+
+    function updateCounter() {
+      const counterEl = document.getElementById("counter");
+      if (!filteredRecords.length) {
+        counterEl.textContent = "0 adhérent";
+        return;
+      }
+      counterEl.textContent = `${selectedIndex + 1} / ${filteredRecords.length} adhérents`;
+    }
+
+    function renderDetail() {
+      const detail = document.getElementById("detail");
+      updateCounter();
+
+      if (!filteredRecords.length) {
+        detail.innerHTML = `<div class="empty">Aucun adhérent à afficher.</div>`;
+        return;
+      }
+
+      selectedIndex = Math.max(0, Math.min(selectedIndex, filteredRecords.length - 1));
+
+      const r = filteredRecords[selectedIndex];
+      const age = computeAge(r.Date_de_naissance);
+      const decorations = getDecorationSummary(r);
+
+      const pills = [];
+      if (asText(r.Statut_licence)) pills.push(`<span class="pill ok">Statut : ${escapeHtml(asText(r.Statut_licence))}</span>`);
+      if (yesNo(r.Membre_Sympathisant) === "Oui") pills.push(`<span class="pill warn">Membre sympathisant</span>`);
+      if (yesNo(r.licencie_a_vie) === "Oui") pills.push(`<span class="pill ok">Licencié à vie</span>`);
+      if (yesNo(r.Deces) === "Oui") pills.push(`<span class="pill danger">Décédé</span>`);
+      if (!pills.length) pills.push(`<span class="pill neutral">Aucun statut particulier</span>`);
+
+      const honorChips = getHonorChips(r);
+
+      detail.innerHTML = `
+        <div class="identity">
+          <div>
+            <h1>${escapeHtml(fullName(r))}</h1>
+            <div class="subline">
+              Licence n° ${escapeHtml(asText(r.Numero_de_licence) || "-")}
+              ${asText(r.Sexe) ? " • " + escapeHtml(asText(r.Sexe)) : ""}
+              ${age !== "" ? " • " + escapeHtml(String(age)) + " ans" : ""}
+            </div>
+            <div class="pills">${pills.join("")}</div>
+            ${honorChips ? `<div class="honors">${honorChips}</div>` : ""}
+          </div>
+          <div class="cursor-note">
+            Utilisez la recherche puis les boutons précédent / suivant.
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Identité</h3>
+            <div class="kv">
+              <div class="k">Nom</div><div class="v">${escapeHtml(asText(r.Nom) || "-")}</div>
+              <div class="k">Prénom</div><div class="v">${escapeHtml(asText(r.Prenom) || "-")}</div>
+              <div class="k">Nom de jeune fille</div><div class="v">${escapeHtml(maidenNameLine(r) || "-")}</div>
+              <div class="k">Date de naissance</div><div class="v">${escapeHtml(formatDate(r.Date_de_naissance) || "-")}</div>
+              <div class="k">Nationalité</div><div class="v">${escapeHtml(asText(r.Nationalite) || "-")}</div>
+              <div class="k">Département</div><div class="v">${escapeHtml(asText(r.Departement) || "-")}</div>
+              <div class="k">Région</div><div class="v">${escapeHtml(asText(r.Region) || "-")}</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Coordonnées</h3>
+            <div class="kv">
+              <div class="k">Adresse</div><div class="v">${escapeHtml(asText(r.Adresse) || "-")}</div>
+              <div class="k">Code postal</div><div class="v">${escapeHtml(asText(r.Code_postal) || "-")}</div>
+              <div class="k">Ville</div><div class="v">${escapeHtml(asText(r.Ville) || "-")}</div>
+              <div class="k">Téléphone fixe</div><div class="v">${escapeHtml(asText(r.Telephone_1_fixe_) || "-")}</div>
+              <div class="k">Téléphone mobile</div><div class="v">${escapeHtml(asText(r.Telephone_2_mobile_) || "-")}</div>
+              <div class="k">Téléphone 3</div><div class="v">${escapeHtml(asText(r.Telephone_3) || "-")}</div>
+              <div class="k">Mail 1</div><div class="v">${formatEmail(r.Adresse_mail_1)}</div>
+              <div class="k">Mail 2</div><div class="v">${formatEmail(r.Adresse_mail_2)}</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Engagement / activité</h3>
+            <div class="kv">
+              <div class="k">Fonction</div><div class="v">${escapeHtml(asText(r.Fonction) || "-")}</div>
+              <div class="k">Discipline</div><div class="v">${escapeHtml(asText(r.Discipline) || "-")}</div>
+              <div class="k">Statut licence</div><div class="v">${escapeHtml(asText(r.Statut_licence) || "-")}</div>
+              <div class="k">Membre sympathisant</div><div class="v">${escapeHtml(yesNo(r.Membre_Sympathisant) || "-")}</div>
+              <div class="k">Licencié à vie</div><div class="v">${escapeHtml(yesNo(r.licencie_a_vie) || "-")}</div>
+              <div class="k">Décès</div><div class="v">${escapeHtml(yesNo(r.Deces) || "-")}</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Décorations et récompenses</h3>
+            <div class="decor-grid">
+              <div class="stat">
+                <div class="n">🥇 ${asNumber(r.Medaille_OR)}</div>
+                <div class="l">Médaille OR</div>
+              </div>
+              <div class="stat">
+                <div class="n">🥈 ${asNumber(r.Medaille_Argent)}</div>
+                <div class="l">Médaille Argent</div>
+              </div>
+              <div class="stat">
+                <div class="n">🥉 ${asNumber(r.Medaille_Bronze)}</div>
+                <div class="l">Médaille Bronze</div>
+              </div>
+              <div class="stat">
+                <div class="n">${asNumber(r.Lettre_de_felicitations)}</div>
+                <div class="l">Lettre de félicitations</div>
+              </div>
+              <div class="stat">
+                <div class="n">${asNumber(r.Recompense_Or)}</div>
+                <div class="l">Récompense OR</div>
+              </div>
+              <div class="stat">
+                <div class="n">${asNumber(r.Recompense_Argent)}</div>
+                <div class="l">Récompense Argent</div>
+              </div>
+              <div class="stat">
+                <div class="n">${asNumber(r.Recompense_Bronze)}</div>
+                <div class="l">Récompense Bronze</div>
+              </div>
+              <div class="stat">
+                <div class="n">${decorations.length}</div>
+                <div class="l">Types obtenus</div>
+              </div>
+            </div>
+            <div class="footer-note" style="margin-top:10px;">
+              ${decorations.length ? escapeHtml(decorations.join(" • ")) : "Aucune décoration ou récompense repérée dans les champs fournis."}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function applyFilter() {
+      const q = document.getElementById("search").value.trim().toLowerCase();
+      filteredRecords = !q
+        ? [...allRecords]
+        : allRecords.filter(r => searchableText(r).includes(q));
+
+      selectedIndex = 0;
+      renderDetail();
+      syncGristSelection();
+    }
+
+    function syncGristSelection() {
+      const r = filteredRecords[selectedIndex];
+      if (!r || !grist?.setCursorPos) return;
+      if (r.id !== undefined) {
+        grist.setCursorPos({rowId: r.id});
+      }
+    }
+
+    function normalizeRecords(records) {
+      return records.map(r => {
+        const x = {};
+        for (const c of REQUIRED_COLUMNS) x[c] = r[c];
+        x.id = r.id;
+        return x;
+      });
+    }
+
+    async function initGrist() {
+      grist.ready({
+        requiredAccess: "read table",
+        columns: REQUIRED_COLUMNS
+      });
+
+      grist.onRecords((records) => {
+        allRecords = normalizeRecords(records || []);
+        filteredRecords = [...allRecords];
+        selectedIndex = 0;
+        renderDetail();
+      });
+
+      grist.onRecord((record) => {
+        if (!record || !filteredRecords.length) return;
+        const idx = filteredRecords.findIndex(r => r.id === record.id);
+        if (idx >= 0) {
+          selectedIndex = idx;
+          renderDetail();
+        }
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", applyFilter);
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      if (!filteredRecords.length) return;
+      selectedIndex = (selectedIndex - 1 + filteredRecords.length) % filteredRecords.length;
+      renderDetail();
+      syncGristSelection();
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      if (!filteredRecords.length) return;
+      selectedIndex = (selectedIndex + 1) % filteredRecords.length;
+      renderDetail();
+      syncGristSelection();
+    });
+
+    initGrist();
+  </script>
+</body>
+</html>
